@@ -26,6 +26,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          env:
-            - name: COLOR_API_URL
-              value: "http://color-api:8080"
+          # env:
+          # - name: COLOR_API_URL
+          #   value: "http://color-api:8080"

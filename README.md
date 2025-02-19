@@ -137,7 +137,7 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
 
     The nextjs-frontend is already done for you as an example. You can find the deployment files in the [kube/nextjs-frontend](kube/nextjs-frontend) directory.
     ```bash
-    kubectl apply -f kube/nextjs-frontend
+    kubectl apply -n workshop -f kube/nextjs-frontend
     ```
 
     Go ahead and create the `color-api` deployment files.
