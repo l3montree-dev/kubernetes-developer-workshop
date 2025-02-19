@@ -88,10 +88,11 @@ https://minikube.sigs.k8s.io/docs/start/
 brew install minikube && minikube start
 ```
 
-Enable the storage provisioner
+Enable the storage provisioner and ingress controller
 
 ```bash
 minikube addons enable storage-provisioner
+minikube addons enable ingress
 ```
 
 ### 3. Create the namespace "workshop" inside the minikube cluster
@@ -124,6 +125,22 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
 
 ### 4. Creating Kubernetes Deployment files
 
+- Deploy the COLOR-API
+
+    The nextjs-frontend is already done for you as an example. Go ahead and create the `color-api` deployment files.
+
+    Hints:
+
+    - We need a deployment and a service
+    - You can use the publicly available image `ghcr.io/l3montree-dev/kubernetes-developer-workshop/color-api:latest`
+    - The application starts at port 8080
+    - The application needs the following environment variables:
+        - `DB_URL`: jdbc:postgresql://postgresql:5432/postgres
+        - `DB_USER`: postgres
+        - `DB_PASS`: ? (hint: check the secret)
+
+
+- Configure the connection between the frontend and the color-api (COLOR_API_URL environment variable)
 
 
 ## Building and publishing the Docker-Images

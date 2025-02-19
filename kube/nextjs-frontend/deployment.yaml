@@ -18,6 +18,6 @@ spec:
           image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest
           ports:
             - containerPort: 3000
-          # env:
-          #   - name: COLOR_API_URL
-          #     value: "http://color-api:8080"
+          env:
+            - name: COLOR_API_URL
+              value: "http://color-api:8080"
