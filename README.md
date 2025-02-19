@@ -97,11 +97,19 @@ minikube addons enable ingress
 
 ### 3. Create the namespace "workshop" inside the minikube cluster
 
+Set the kubectl alias to the minikube cluster
+
 ```bash
-minikube kubectl create namespace workshop
+alias kubectl="minikube kubectl --"
 ```
 
-If this command fails - install `kubectl` by following this documentation: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux
+Create the namespace
+
+```bash
+kubectl create namespace workshop
+```
+
+Alternative: install `kubectl` by following this documentation: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux
 
 ### 3. PostgreSQL-Installation using Helm
 
@@ -127,7 +135,12 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
 
 - Deploy the COLOR-API
 
-    The nextjs-frontend is already done for you as an example. Go ahead and create the `color-api` deployment files.
+    The nextjs-frontend is already done for you as an example. You can find the deployment files in the [kube/nextjs-frontend](kube/nextjs-frontend) directory.
+    ```bash
+    kubectl apply -f kube/nextjs-frontend
+    ```
+
+    Go ahead and create the `color-api` deployment files.
 
     Apply it to the cluster using the following command:
 
@@ -143,7 +156,7 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
     - The application needs the following environment variables:
         - `DB_URL`: jdbc:postgresql://postgresql:5432/postgres
         - `DB_USER`: postgres
-        - `DB_PASS`: ? (hint: check the secret)
+        - `DB_PASS`: ? (hint: check the secret already created by the postgresql helm chart)
 
 
 - Configure the connection between the frontend and the color-api (COLOR_API_URL environment variable)

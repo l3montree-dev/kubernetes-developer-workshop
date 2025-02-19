@@ -1,3 +1,11 @@
+####
+# Note: this is a basic example file 
+# for production scenarios, you should
+# consider building deployments with 
+# features like livenessProbe, 
+# readinessProbe, securityContext, 
+# resource limits, etc.
+####
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,6 +23,7 @@ spec:
       containers:
         - name: frontend
           image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
