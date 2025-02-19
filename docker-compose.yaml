@@ -11,7 +11,15 @@ services:
       - 3000:3000
   color-api:
     build:
-      context: demo-color-api
+      context: color-api
       dockerfile: Dockerfile
     ports:
       - 8080:8080
+  postgresql:
+    image: postgres:17.3
+    environment:
+      POSTGRES_USER: color-api
+      POSTGRES_PASSWORD: color-api
+      POSTGRES_DB: color-api
+    ports:
+      - 5432:5432
