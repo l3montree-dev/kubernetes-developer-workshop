@@ -2,12 +2,12 @@
 
 ## Inspecting Docker-Images. Just a fancy Tar-Archive
 
-1. Have a look at the example spring boot application in the [demo](demo) directory. It is super exiting since it provides an endpoint which returns a random hex color.
+1. Have a look at the example spring boot application in the [demo-color-api](demo-color-api) directory. It is super exiting since it provides an endpoint which returns a random hex color.
 
-2. Have a look at the [Dockerfile](demo/Dockerfile)
+2. Have a look at the [Dockerfile](demo-color-api/Dockerfile)
 3. Build the Container-File with the following command:
 ```bash
-docker build -t spring-boot-demo:latest demo
+docker build -t spring-boot-demo:latest demo-color-api
 ```
 
 4. Run the Container with the following command:
