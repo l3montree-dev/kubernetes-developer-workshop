@@ -29,4 +29,11 @@ public class DemoController {
 
         return response;
 	}
+
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        Map<String, String> response = new HashMap<String, String>();
+        response.put("status", "UP");
+        return response;
+    }
 }
