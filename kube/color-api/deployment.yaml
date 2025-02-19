@@ -1,3 +1,11 @@
+####
+# Note: this is a basic example file 
+# for production scenarios, you should
+# consider building deployments with 
+# features like livenessProbe, 
+# readinessProbe, securityContext, 
+# resource limits, etc.
+####
 apiVersion: apps/v1
 kind: Deployment
 metadata:
