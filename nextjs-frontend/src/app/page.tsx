@@ -12,7 +12,7 @@ export default async function Home() {
         );
   }
 
-  const { hex } = await fetch(process.env.COLOR_API_URL + "/color").then((res) => res.json());
+  const { hex } = await fetch(process.env.COLOR_API_URL + "/color", { cache: 'no-store' }).then((res) => res.json());
     
   console.log(hex)
   return (
