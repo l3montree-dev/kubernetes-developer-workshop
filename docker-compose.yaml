@@ -2,25 +2,25 @@ version: '3'
 
 services:
   frontend:
-    image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest
-    # build:
-    #   context: nextjs-frontend
-    #   dockerfile: Dockerfile
+    # image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest
+    build:
+       context: nextjs-frontend
+       dockerfile: Dockerfile
     environment:
       COLOR_API_URL: http://color-api:8080
     ports:
       - 3000:3000
   color-api:
-    image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/color-api:latest
-    # build:
-    #   context: color-api
-    #   dockerfile: Dockerfile
+    # image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/color-api:latest
+    build:
+       context: color-api
+       dockerfile: Dockerfile
     ports:
       - 8080:8080
     environment:
       DB_URL: jdbc:postgresql://postgresql:5432/color-api
       DB_USER: color-api
-      DB_PASSWORD: color-api
+      DB_PASS: color-api
   postgresql:
     image: postgres:17.3
     environment:

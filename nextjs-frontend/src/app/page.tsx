@@ -6,7 +6,7 @@ export default async function Home() {
       return (
           <div className="flex flex-row items-center flex-1 h-screen justify-center">
               <h2 className="text-4xl font-bold text-center">
-                Ich kann keine COLOR_API_URL Umgebungsvariable finden!
+                Unable to find COLOR_API_URL environment variable!
               </h2>
           </div>
         );
