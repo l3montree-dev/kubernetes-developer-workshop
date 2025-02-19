@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: nextjs-frontend
+      dockerfile: Dockerfile
+    environment:
+      COLOR_API_URL: http://color-api:8080
+    ports:
+      - 3000:3000
+  color-api:
+    build:
+      context: demo-color-api
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
