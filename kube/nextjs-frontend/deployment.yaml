@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest@sha256:8ad31379891c2814803f7a654b079cc23539a2bd90bcbd772c6821e6ea772673
+          image: ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
