@@ -1,6 +1,9 @@
 import { connection } from "next/server";
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
+
   await connection()
   if (!process.env.COLOR_API_URL) {
       return (
@@ -12,7 +15,10 @@ export default async function Home() {
         );
   }
 
-  const { hex } = await fetch(process.env.COLOR_API_URL + "/color", { cache: 'no-store' }).then((res) => res.json());
+  const { hex } = await fetch(process.env.COLOR_API_URL + "/color", { cache: 'no-store', next: {revalidate: 0}, method: "GET", headers: {
+    Accept: "*/*",
+    Connection: "close",
+  }}).then((res) => res.json());
     
   console.log(hex)
   return (
