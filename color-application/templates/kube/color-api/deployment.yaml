@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: color-api
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: color-api
@@ -19,11 +19,11 @@ spec:
             - containerPort: 8080
           env:
             - name: DB_URL
-              value: "jdbc:postgresql://postgresql:5432/postgres"
+              value: "jdbc:postgresql://color-application-postgresql:5432/postgres"
             - name: DB_USER
               value: "postgres"
             - name: DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: postgresql
+                  name: color-application-postgresql
                   key: postgres-password

@@ -129,6 +129,12 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
 
     The nextjs-frontend is already done for you as an example. Go ahead and create the `color-api` deployment files.
 
+    Apply it to the cluster using the following command:
+
+    ```bash
+    kubectl apply -n workshop -f kube/color-api
+    ```
+
     Hints:
 
     - We need a deployment and a service
@@ -141,6 +147,203 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
 
 
 - Configure the connection between the frontend and the color-api (COLOR_API_URL environment variable)
+
+### 5. Deploy the whole application - kubernetes is idempotent
+
+```bash
+kubectl apply -n workshop -R -f kube
+```
+
+Have a look at the running pods
+
+```bash
+kubectl get pods -n workshop
+
+NAME                         READY   STATUS    RESTARTS      AGE
+color-api-5c8bc7f9d6-2t7df   1/1     Running   0             23m
+color-api-5c8bc7f9d6-72qnw   1/1     Running   0             23m
+frontend-68bcf87ffd-n7wtp    1/1     Running   0             39m
+postgresql-0                 1/1     Running   1 (49m ago)   63m
+```
+
+Use minikube to view the frontend
+
+```bash
+minikube tunnel
+```
+
+The frontend should be available at [http://127.0.0.1](http://127.0.0.1).
+
+### 6. Create a Helm-Chart for the color-api
+
+```bash
+helm create color-application
+```
+
+Run the following command to remove everything except the Chart.yaml and values.yaml
+
+```bash
+rm -rf color-application/templates/* color-application/charts
+```
+
+Run the following command to clear the values.yaml file
+
+```bash
+echo "" > color-application/values.yaml
+```
+
+Now we can start with a fresh helm chart.
+
+1. Copy the contents of the kube folder inside the templates folder of the helm chart
+   ```bash
+    cp -r kube/* color-application/templates/
+    ```
+
+2. Modify the color-application/nextjs-frontend/ingress.yaml file path prefix. Call it `/helm`. Since we already have an ingress defined
+
+3. Thats it. We created a helm chart. Install it using helm
+
+   ```bash
+    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+    ```
+
+4. Have a look at the running pods. Notice the different namespace `workshop-helm`
+
+    ```bash
+    kubectl get pods -n workshop-helm
+
+    NAME                         READY   STATUS                       RESTARTS   AGE
+    color-api-564cf76456-nchc7   0/1     CreateContainerConfigError   0          9m56s
+    color-api-564cf76456-w2dkr   0/1     CreateContainerConfigError   0          9m56s
+    frontend-68bcf87ffd-6pkz9    1/1     Running                      0          9m56s
+    ```
+    
+    The color-api pods are not able to start. We are missing the database we installed with helm in the `workshop` namespace. We need to create a dependency between the color-api and the postgresql helm-chart.
+
+5. Add the postgresql dependency to the `Chart.yaml`
+
+    ```yaml
+    dependencies:
+      - name: postgresql
+        version: 16.4.9
+        repository: https://charts.bitnami.com/bitnami
+    ```
+
+    Now try to install the helm chart again
+
+    ```bash
+    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+    ```
+
+    It fails. We need to install the dependencies first.
+
+6. Install the dependencies
+
+    ```bash
+    helm dependency update color-application
+    ```
+
+    Apply the helm chart again
+
+    ```bash
+    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+    ```
+
+    Have a look at the running pods.
+
+    ```bash
+    kubectl get pods -n workshop-helm
+
+    NAME                             READY   STATUS                       RESTARTS   AGE
+    color-api-564cf76456-khh2s       0/1     CreateContainerConfigError   0          52s
+    color-api-564cf76456-w2dkr       0/1     CreateContainerConfigError   0          16m
+    color-application-postgresql-0   1/1     Running                      0          108s
+    frontend-68bcf87ffd-6pkz9        1/1     Running                      0          16m
+    ```
+
+    We were able to install the postgresql dependency. The color-api pods are still not able to start. We need to configure the environment variables.
+
+7. Correct the deployment of the color-api
+
+    The color-api needs the postgresql password again. Maybe we can use a secretKeyRef environment variable.
+
+    ```yaml
+    env:
+      - name: DB_PASS
+        valueFrom:
+          secretKeyRef:
+            name: color-application-postgresql
+            key: postgres-password
+    ```
+
+    Check if the DB_URL is correctly configured. You can find the created service name with the following command:
+
+    ```bash
+    kubectl get services -n workshop-helm
+    ```
+
+    Apply the helm chart again
+
+    ```bash
+    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+    ```
+
+8. Check the running pods and visit the frontend
+
+9. Use Helm Values to configure the amount of color-api replicas
+
+    ```yaml
+    # values.yaml
+    replicaCount: 2
+    ```
+
+    Use the `replicaCount` value in the [color-application/color-api/deployment.yaml](color-application/color-api/deployment.yaml)
+
+    ```yaml
+    spec:
+      replicas: {{ .Values.replicaCount }}
+    ```
+
+    Apply the helm chart again
+
+    ```bash
+    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+    ```
+
+    Check the running pods
+
+    ```bash
+    kubectl get pods -n workshop-helm
+
+    NAME                             READY   STATUS    RESTARTS   AGE
+    color-api-86f8b7bb7d-29mt7       1/1     Running   0          8m48s
+    color-api-86f8b7bb7d-2lzql       1/1     Running   0          8m46s
+    color-api-86f8b7bb7d-rl78x       1/1     Running   0          15s
+    color-application-postgresql-0   1/1     Running   0          10m
+    frontend-68bcf87ffd-vvv5v        1/1     Running   0          10m
+    ```
+
+    Visit the frontend - now we should see 3 different colors after reloading a few times.
+
+10. Thats it - we have created a small basic helm chart. Lets package it
+
+    ```bash
+    helm package color-application
+    ```
+
+    You can find the packaged helm chart in the `color-application-0.1.0.tgz` file.
+
+    You can install the packaged helm chart using the following command. Notice the `--set` flag to configure the amount of replicas. Since we made it configurable in the values.yaml file, we can use it here.
+
+    ```bash
+    helm install -n workshop-helm-packaged --create-namespace color-application color-application-0.1.0.tgz --set replicaCount=1
+
+
+    Error: INSTALLATION FAILED: 1 error occurred:
+        * admission webhook "validate.nginx.ingress.kubernetes.io" denied the request: host "_" and path "/helm" is already defined in ingress workshop-helm/frontend-ingress
+    ```
+
+    The installation fails, since we cannot again define the same path in the ingress. Maybe we can make that configurable as well?
 
 
 ## Building and publishing the Docker-Images
