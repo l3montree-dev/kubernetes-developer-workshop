@@ -1,5 +1,10 @@
 # Kubernetes for Developers Workshop 🚀
 
+> [!CAUTION]
+> All material provides **only an introduction** to containerization & K8s.
+> It is not intended for production use and does not cover all best practices.
+> Please dig especially into security topics before deploying anything to production.
+
 This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
 
 ## Prerequisites
@@ -20,7 +25,9 @@ flowchart TD
     B-->|Logs Request| C[PostgreSQL]
 ```
 
-### 1. Understanding Containers
+## Section 1: Containerize the Application
+
+### Part 1.1 Understanding Containers
 
 1. Explore the example Spring Boot application in the [color-api](color-api) directory. It provides an endpoint that returns a random hex color.
 2. Review the [Dockerfile](color-api/Dockerfile).
@@ -39,11 +46,11 @@ flowchart TD
 
 6. Examine the [merged_layers](merged_layers) folder to see the file system of the container image.
 
-#### Understanding Multi-Stage Builds (Optional)
+#### Part 1.1.1 Understanding Multi-Stage Builds (Optional)
 
 7. Modify the Dockerfile as instructed in the comments to create a multi-stage build. Rebuild and inspect the image again.
 
-### 2. Build and Run the Frontend Application Container
+### Part 1.2 Build and Run the Frontend Application Container
 
 1. Explore the example Next.js application in the [nextjs-frontend](nextjs-frontend) directory. It fetches the randomly generated color from the color-api and displays it.
 2. Build and run the container:
@@ -55,7 +62,7 @@ flowchart TD
 
 <img src="docs/err.png" width="750">
 
-### 3. Connecting Containers Using docker-compose
+### Part 1.3 Connecting Containers Using docker-compose
 
 1. Review the [docker-compose.yaml](docker-compose.yaml) file.
 2. Note that it adds PostgreSQL to the deployment and configures the `COLOR_API_URL` environment variable.
@@ -67,7 +74,9 @@ flowchart TD
 
 <img src="docs/result.png" width="750">
 
-### 4. Installing and Starting Minikube
+## Section 2: Kubernetes Deployment
+
+### Part 2.1 Installing and Starting Minikube
 
 Follow the instructions at [Minikube Start](https://minikube.sigs.k8s.io/docs/start/).
 
@@ -82,7 +91,7 @@ minikube addons enable storage-provisioner
 minikube addons enable ingress
 ```
 
-### 5. Create the "workshop" Namespace in Minikube
+### Part 2.2 Create the "workshop" Namespace in Minikube
 
 Set the kubectl alias to the Minikube cluster:
 
@@ -98,7 +107,7 @@ kubectl create namespace workshop
 
 Alternatively, install `kubectl` by following the [official documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux).
 
-### 6. PostgreSQL Installation Using Helm
+### Part 2.3 PostgreSQL Installation Using Helm
 
 Add the Bitnami repository:
 
@@ -121,7 +130,7 @@ NAME                        READY   STATUS    RESTARTS       AGE
 postgresql-0                1/1     Running   1 (2m5s ago)   15m
 ```
 
-### 7. Creating Kubernetes Deployment Files
+### Part 2.4 Creating Kubernetes Deployment Files
 
 - Deploy the COLOR-API
 
@@ -147,7 +156,7 @@ postgresql-0                1/1     Running   1 (2m5s ago)   15m
 
 - Configure the connection between the frontend and the color-api using the `COLOR_API_URL` environment variable.
 
-### 8. Deploy the Entire Application
+### Part 2.5 Deploy the Entire Application
 
 Kubernetes is idempotent, so you can apply the entire configuration:
 
@@ -175,7 +184,9 @@ minikube tunnel
 
 The frontend should be available at [http://127.0.0.1](http://127.0.0.1).
 
-### 9. Create a Helm Chart for the color-api
+## Section 3: Helm Charts
+
+### Part 3.1 Create a Helm Chart for the color-api
 
 Create a new Helm chart:
 
@@ -284,7 +295,7 @@ helm upgrade --install -n workshop-helm --create-namespace color-application col
 
 Check the running pods and visit the frontend.
 
-### 10. Configure Helm Values for Replicas
+### Part 3.2 Configure Helm Values for Replicas
 
 Set the number of replicas in `values.yaml`:
 
@@ -321,7 +332,7 @@ frontend-68bcf87ffd-vvv5v        1/1     Running   0          10m
 
 Visit the frontend. You should see three different colors after reloading a few times.
 
-### 11. Package the Helm Chart
+### Part 3.3 Package the Helm Chart
 
 Package the Helm chart:
 
@@ -337,7 +348,10 @@ helm install -n workshop-helm-packaged --create-namespace color-application colo
 
 The installation fails due to a conflicting path in the ingress. Maybe this can be made configurable as well?
 
-## Building and Publishing Docker Images
+
+## Miscellaneous
+
+### Building and Publishing Docker Images
 
 Build and push the Docker images:
 
