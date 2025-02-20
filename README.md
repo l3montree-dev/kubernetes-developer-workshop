@@ -154,6 +154,8 @@ Install PostgreSQL:
 
 ```bash
 helm install -n workshop postgresql bitnami/postgresql
+# or
+helm install postgresql -n workshop oci://registry-1.docker.io/bitnamicharts/postgresql
 ```
 
 Inspect the running deployment to ensure it started successfully:
