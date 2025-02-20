@@ -1,4 +1,4 @@
-# Kubernetes for Developers Workshop
+# Kubernetes for Developers Workshop 🚀
 
 This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
 
