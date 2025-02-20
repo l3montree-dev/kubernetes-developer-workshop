@@ -7,6 +7,43 @@
 
 This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
 
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#prerequisites">Prerequisites</a>
+    </li>
+    <li>
+      <a href="#color-application-architecture-overview">Color-Application Architecture Overview</a>
+    </li>
+    <li><a href="#section-1-containerize-the-application">Section 1 Containerize the Application</a>
+      <ul>
+        <li><a href="#part-11-understanding-containers">Part 1.1 Understanding Containers</a></li>
+        <ul>
+          <li><a href="#part-111-understanding-multi-stage-builds-optional">Part 1.1.1 Understanding Multi-Stage Builds (Optional)</a></li>
+        </ul>
+        <li><a href="#part-12-build-and-run-the-frontend-application-container">Part 1.2 Build and Run the Frontend Application Container</a></li>
+        <li><a href="#part-13-connecting-containers-using-docker-compose">Part 1.3 Connecting Containers Using docker-compose</a></li>
+      </ul>
+    <li><a href="#section-2-kubernetes-deployment">Section 2 Kubernetes Deployment</a></li>
+      <ul>
+        <li><a href="#part-21-installing-and-starting-minikube">Part 2.1 Installing and Starting Minikube</a></li>
+        <li><a href="#part-22-create-the-workshop-namespace-in-minikube">Part 2.2 Create the "workshop" Namespace in Minikube</a></li>
+        <li><a href="#part-23-postgresql-installation-using-helm">Part 2.3 PostgreSQL Installation Using Helm</a></li>
+        <li><a href="#part-24-creating-kubernetes-deployment-files">Part 2.4 Creating Kubernetes Deployment Files</a></li>
+        <li><a href="#part-25-deploy-the-entire-application">Part 2.5 Deploy the Entire Application</a></li>
+      </ul>
+    </li>
+    <li><a href="#section-3-helm-charts">Section 3: Helm Charts</a></li>
+      <ul>
+        <li><a href="#part-31-create-a-helm-chart-for-the-color-api">Part 3.1 Create a Helm Chart for the color-api</a></li>
+        <li><a href="#part-32-configure-helm-values-for-replicas">Part 3.2 Configure Helm Values for Replicas</a></li>
+        <li><a href="#part-33-package-the-helm-chart">Part 3.3 Package the Helm Chart</a></li>
+      </ul>
+  </ol>
+</details>
+
 ## Prerequisites
 - Install [Homebrew](https://brew.sh/)
 - Docker or Podman
@@ -14,9 +51,7 @@ This workshop is intended for developers who want to learn how to deploy applica
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux)
 - [Helm](https://helm.sh/docs/intro/install/)
 
-## Follow the Workshop
-
-### Color-Application Architecture Overview
+## Color-Application Architecture Overview
 
 ```mermaid
 flowchart TD
@@ -25,7 +60,7 @@ flowchart TD
     B-->|Logs Request| C[PostgreSQL]
 ```
 
-## Section 1: Containerize the Application
+## Section 1 Containerize the Application
 
 ### Part 1.1 Understanding Containers
 
@@ -74,7 +109,7 @@ flowchart TD
 
 <img src="docs/result.png" width="750">
 
-## Section 2: Kubernetes Deployment
+## Section 2 Kubernetes Deployment
 
 ### Part 2.1 Installing and Starting Minikube
 
