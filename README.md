@@ -3,14 +3,13 @@
 This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
 
 ## Prerequisites
-- Install Homebrew (https://brew.sh/)
+- Install [Homebrew](https://brew.sh/)
 - Docker or Podman
-- Minikube (https://minikube.sigs.k8s.io/docs/start/)
-- kubectl (https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux)
-- Helm (https://helm.sh/docs/intro/install/)
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux)
+- [Helm](https://helm.sh/docs/intro/install/)
 
-## Follow the workshop
-
+## Follow the Workshop
 
 ### Color-Application Architecture Overview
 
@@ -21,107 +20,99 @@ flowchart TD
     B-->|Logs Request| C[PostgreSQL]
 ```
 
+### 1. Understanding Containers
 
-### 1. Understanding Containers (just fancy tar archives)
+1. Explore the example Spring Boot application in the [color-api](color-api) directory. It provides an endpoint that returns a random hex color.
+2. Review the [Dockerfile](color-api/Dockerfile).
+3. Build the container image with the following command:
+    ```bash
+    docker build -t spring-boot-demo:latest color-api
+    ```
+4. Inspect the image, which is essentially a tar archive:
+    ```bash
+    docker save spring-boot-demo:latest -o spring-boot-demo.tar
+    ```
+5. Run the `inspect_layers.sh` script:
+   - It extracts the tar archive into the [extracted_image](extracted_image) folder.
+   - It extracts each layer tar archive in the [extracted_image/blobs](extracted_image/blobs) folder into the [layers](layers) folder.
+   - It merges the layers into a single file system in the [merged_layers](merged_layers) folder, resolving conflicts by replacing files as needed.
 
-1. Have a look at the example spring boot application in the [color-api](color-api) directory. It is super exiting since it provides an endpoint which returns a random hex color.
+6. Examine the [merged_layers](merged_layers) folder to see the file system of the container image.
 
-2. Have a look at the [Dockerfile](color-api/Dockerfile)
-3. Build the Container-File with the following command:
-```bash
-docker build -t spring-boot-demo:latest color-api
-```
+#### Understanding Multi-Stage Builds (Optional)
 
-4. Lets inspect the image - actually it is a fancy called tar archive:
-```bash
-docker save spring-boot-demo:latest -o spring-boot-demo.tar
-```
+7. Modify the Dockerfile as instructed in the comments to create a multi-stage build. Rebuild and inspect the image again.
 
-5. Run the `inspect_layers.sh` shell script
-   - It extracts the tar archive into the [extracted_image](extracted_image) folder
-   - It extracts each layer tar archive in the [extracted_image/blobs](extracted_image/blobs) folder into the [layers](layers) folder
-   - It merges the layers into a single file system in the [merged_layers](merged_layers) folder - it just copies all files and says "replace" when there is a conflict (the script does have a look at the order which is defined in [extracted_image/manifest.json](extracted_image/manifest.json))
+### 2. Build and Run the Frontend Application Container
 
-6. Have a look at the [merged_layers](merged_layers) folder - it is the file system of the container image
-
-#### Understanding Multi-Stage Builds (optional)
-
-7. Modify the docker file and follow the instructions inside the comment. This makes it a multi-stage build. Lets build again and inspect the image again.
-
-### 2. Build and run the frontend application container
-
-1. Have a look at the example next.js application in the [nextjs-frontend](nextjs-frontend) directory. It just fetches the randomly generated color from the color-api and displays it.
-
-2. Build and run the container
-
-```bash
-docker build -t nextjs-frontend:latest nextjs-frontend
-docker run -p 3000:3000 nextjs-frontend:latest
-```
-
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+1. Explore the example Next.js application in the [nextjs-frontend](nextjs-frontend) directory. It fetches the randomly generated color from the color-api and displays it.
+2. Build and run the container:
+    ```bash
+    docker build -t nextjs-frontend:latest nextjs-frontend
+    docker run -p 3000:3000 nextjs-frontend:latest
+    ```
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 <img src="docs/err.png" width="750">
 
+### 3. Connecting Containers Using docker-compose
 
-
-### 2. Connecting the containers using a docker-compose.yaml
-
-1. Have a look at the [docker-compose.yaml](docker-compose.yaml) file
-2. It adds a postgresql to the deployment
-3. It configures the COLOR_API_URL environment variable
-4. Run the following command to **build and start** the containers. Use the image references from github to avoid building the images yourself.
-
-```bash
-docker compose up
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser - now it should return a color from the color-api
+1. Review the [docker-compose.yaml](docker-compose.yaml) file.
+2. Note that it adds PostgreSQL to the deployment and configures the `COLOR_API_URL` environment variable.
+3. Build and start the containers using the following command. Use the image references from GitHub to avoid building the images yourself:
+    ```bash
+    docker compose up
+    ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser. It should now return a color from the color-api.
 
 <img src="docs/result.png" width="750">
 
-### 3. Installing and starting Minikube
+### 4. Installing and Starting Minikube
 
-https://minikube.sigs.k8s.io/docs/start/
+Follow the instructions at [Minikube Start](https://minikube.sigs.k8s.io/docs/start/).
 
 ```bash
 brew install minikube && minikube start
 ```
 
-Enable the storage provisioner and ingress controller
+Enable the storage provisioner and ingress controller:
 
 ```bash
 minikube addons enable storage-provisioner
 minikube addons enable ingress
 ```
 
-### 3. Create the namespace "workshop" inside the minikube cluster
+### 5. Create the "workshop" Namespace in Minikube
 
-Set the kubectl alias to the minikube cluster
+Set the kubectl alias to the Minikube cluster:
 
 ```bash
 alias kubectl="minikube kubectl --"
 ```
 
-Create the namespace
+Create the namespace:
 
 ```bash
 kubectl create namespace workshop
 ```
 
-Alternative: install `kubectl` by following this documentation: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux
+Alternatively, install `kubectl` by following the [official documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux).
 
-### 3. PostgreSQL-Installation using Helm
+### 6. PostgreSQL Installation Using Helm
+
+Add the Bitnami repository:
 
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 
+Install PostgreSQL:
+
 ```bash
 helm install -n workshop postgresql bitnami/postgresql
 ```
 
-Inspect the running deployment - was the startup successful?
+Inspect the running deployment to ensure it started successfully:
 
 ```bash
 kubectl get pods -n workshop
@@ -130,44 +121,41 @@ NAME                        READY   STATUS    RESTARTS       AGE
 postgresql-0                1/1     Running   1 (2m5s ago)   15m
 ```
 
-
-### 4. Creating Kubernetes Deployment files
+### 7. Creating Kubernetes Deployment Files
 
 - Deploy the COLOR-API
 
-    The nextjs-frontend is already done for you as an example. You can find the deployment files in the [kube/nextjs-frontend](kube/nextjs-frontend) directory.
+    The Next.js frontend deployment files are already provided as an example in the [kube/nextjs-frontend](kube/nextjs-frontend) directory.
     ```bash
     kubectl apply -n workshop -f kube/nextjs-frontend
     ```
 
-    Go ahead and create the `color-api` deployment files.
-
-    Apply it to the cluster using the following command:
+    Create the `color-api` deployment files and apply them to the cluster:
 
     ```bash
     kubectl apply -n workshop -f kube/color-api
     ```
 
     Hints:
-
-    - We need a deployment and a service
-    - You can use the publicly available image `ghcr.io/l3montree-dev/kubernetes-developer-workshop/color-api:latest`
-    - The application starts at port 8080
-    - The application needs the following environment variables:
+    - You need a deployment and a service.
+    - Use the image `ghcr.io/l3montree-dev/kubernetes-developer-workshop/color-api:latest`.
+    - The application runs on port 8080.
+    - Required environment variables:
         - `DB_URL`: jdbc:postgresql://postgresql:5432/postgres
         - `DB_USER`: postgres
-        - `DB_PASS`: ? (hint: check the secret already created by the postgresql helm chart)
+        - `DB_PASS`: ? (check the secret created by the PostgreSQL Helm chart)
 
+- Configure the connection between the frontend and the color-api using the `COLOR_API_URL` environment variable.
 
-- Configure the connection between the frontend and the color-api (COLOR_API_URL environment variable)
+### 8. Deploy the Entire Application
 
-### 5. Deploy the whole application - kubernetes is idempotent
+Kubernetes is idempotent, so you can apply the entire configuration:
 
 ```bash
 kubectl apply -n workshop -R -f kube
 ```
 
-Have a look at the running pods
+Check the running pods:
 
 ```bash
 kubectl get pods -n workshop
@@ -179,7 +167,7 @@ frontend-68bcf87ffd-n7wtp    1/1     Running   0             39m
 postgresql-0                 1/1     Running   1 (49m ago)   63m
 ```
 
-Use minikube to view the frontend
+Use Minikube to view the frontend:
 
 ```bash
 minikube tunnel
@@ -187,184 +175,175 @@ minikube tunnel
 
 The frontend should be available at [http://127.0.0.1](http://127.0.0.1).
 
-### 6. Create a Helm-Chart for the color-api
+### 9. Create a Helm Chart for the color-api
+
+Create a new Helm chart:
 
 ```bash
 helm create color-application
 ```
 
-Run the following command to remove everything except the Chart.yaml and values.yaml
+Remove everything except `Chart.yaml` and `values.yaml`:
 
 ```bash
 rm -rf color-application/templates/* color-application/charts
 ```
 
-Run the following command to clear the values.yaml file
+Clear the `values.yaml` file:
 
 ```bash
 echo "" > color-application/values.yaml
 ```
 
-Now we can start with a fresh helm chart.
+Copy the contents of the `kube` folder into the `templates` folder of the Helm chart:
 
-1. Copy the contents of the kube folder inside the templates folder of the helm chart
-   ```bash
-    cp -r kube/* color-application/templates/
-    ```
+```bash
+cp -r kube/* color-application/templates/
+```
 
-2. Modify the color-application/nextjs-frontend/ingress.yaml file path prefix. Call it `/helm`. Since we already have an ingress defined
+Modify the `color-application/nextjs-frontend/ingress.yaml` file to use the path prefix `/helm`.
 
-3. Thats it. We created a helm chart. Install it using helm
+Install the Helm chart:
 
-   ```bash
-    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
-    ```
+```bash
+helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+```
 
-4. Have a look at the running pods. Notice the different namespace `workshop-helm`
+Check the running pods in the `workshop-helm` namespace:
 
-    ```bash
-    kubectl get pods -n workshop-helm
+```bash
+kubectl get pods -n workshop-helm
 
-    NAME                         READY   STATUS                       RESTARTS   AGE
-    color-api-564cf76456-nchc7   0/1     CreateContainerConfigError   0          9m56s
-    color-api-564cf76456-w2dkr   0/1     CreateContainerConfigError   0          9m56s
-    frontend-68bcf87ffd-6pkz9    1/1     Running                      0          9m56s
-    ```
-    
-    The color-api pods are not able to start. We are missing the database we installed with helm in the `workshop` namespace. We need to create a dependency between the color-api and the postgresql helm-chart.
+NAME                         READY   STATUS                       RESTARTS   AGE
+color-api-564cf76456-nchc7   0/1     CreateContainerConfigError   0          9m56s
+color-api-564cf76456-w2dkr   0/1     CreateContainerConfigError   0          9m56s
+frontend-68bcf87ffd-6pkz9    1/1     Running                      0          9m56s
+```
 
-5. Add the postgresql dependency to the `Chart.yaml`
+The color-api pods are not starting because the database is missing. Add the PostgreSQL dependency to `Chart.yaml`:
 
-    ```yaml
-    dependencies:
-      - name: postgresql
-        version: 16.4.9
-        repository: https://charts.bitnami.com/bitnami
-    ```
+```yaml
+dependencies:
+  - name: postgresql
+    version: 16.4.9
+    repository: https://charts.bitnami.com/bitnami
+```
 
-    Now try to install the helm chart again
+Install the Helm chart again:
 
-    ```bash
-    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
-    ```
+```bash
+helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+```
 
-    It fails. We need to install the dependencies first.
+If it fails, install the dependencies first:
 
-6. Install the dependencies
+```bash
+helm dependency update color-application
+```
 
-    ```bash
-    helm dependency update color-application
-    ```
+Apply the Helm chart again:
 
-    Apply the helm chart again
+```bash
+helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+```
 
-    ```bash
-    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
-    ```
+Check the running pods:
 
-    Have a look at the running pods.
+```bash
+kubectl get pods -n workshop-helm
 
-    ```bash
-    kubectl get pods -n workshop-helm
+NAME                             READY   STATUS                       RESTARTS   AGE
+color-api-564cf76456-khh2s       0/1     CreateContainerConfigError   0          52s
+color-api-564cf76456-w2dkr       0/1     CreateContainerConfigError   0          16m
+color-application-postgresql-0   1/1     Running                      0          108s
+frontend-68bcf87ffd-6pkz9        1/1     Running                      0          16m
+```
 
-    NAME                             READY   STATUS                       RESTARTS   AGE
-    color-api-564cf76456-khh2s       0/1     CreateContainerConfigError   0          52s
-    color-api-564cf76456-w2dkr       0/1     CreateContainerConfigError   0          16m
-    color-application-postgresql-0   1/1     Running                      0          108s
-    frontend-68bcf87ffd-6pkz9        1/1     Running                      0          16m
-    ```
+The color-api pods are still not starting. Configure the environment variables correctly:
 
-    We were able to install the postgresql dependency. The color-api pods are still not able to start. We need to configure the environment variables.
+```yaml
+env:
+  - name: DB_PASS
+    valueFrom:
+      secretKeyRef:
+        name: color-application-postgresql
+        key: postgres-password
+```
 
-7. Correct the deployment of the color-api
+Check if the `DB_URL` is correctly configured. Find the service name with:
 
-    The color-api needs the postgresql password again. Maybe we can use a secretKeyRef environment variable.
+```bash
+kubectl get services -n workshop-helm
+```
 
-    ```yaml
-    env:
-      - name: DB_PASS
-        valueFrom:
-          secretKeyRef:
-            name: color-application-postgresql
-            key: postgres-password
-    ```
+Apply the Helm chart again:
 
-    Check if the DB_URL is correctly configured. You can find the created service name with the following command:
+```bash
+helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+```
 
-    ```bash
-    kubectl get services -n workshop-helm
-    ```
+Check the running pods and visit the frontend.
 
-    Apply the helm chart again
+### 10. Configure Helm Values for Replicas
 
-    ```bash
-    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
-    ```
+Set the number of replicas in `values.yaml`:
 
-8. Check the running pods and visit the frontend
+```yaml
+# values.yaml
+replicaCount: 2
+```
 
-9. Use Helm Values to configure the amount of color-api replicas
+Use the `replicaCount` value in the `color-application/color-api/deployment.yaml`:
 
-    ```yaml
-    # values.yaml
-    replicaCount: 2
-    ```
+```yaml
+spec:
+  replicas: {{ .Values.replicaCount }}
+```
 
-    Use the `replicaCount` value in the [color-application/color-api/deployment.yaml](color-application/color-api/deployment.yaml)
+Apply the Helm chart again:
 
-    ```yaml
-    spec:
-      replicas: {{ .Values.replicaCount }}
-    ```
+```bash
+helm upgrade --install -n workshop-helm --create-namespace color-application color-application
+```
 
-    Apply the helm chart again
+Check the running pods:
 
-    ```bash
-    helm upgrade --install -n workshop-helm --create-namespace color-application color-application
-    ```
+```bash
+kubectl get pods -n workshop-helm
 
-    Check the running pods
+NAME                             READY   STATUS    RESTARTS   AGE
+color-api-86f8b7bb7d-29mt7       1/1     Running   0          8m48s
+color-api-86f8b7bb7d-2lzql       1/1     Running   0          8m46s
+color-api-86f8b7bb7d-rl78x       1/1     Running   0          15s
+color-application-postgresql-0   1/1     Running   0          10m
+frontend-68bcf87ffd-vvv5v        1/1     Running   0          10m
+```
 
-    ```bash
-    kubectl get pods -n workshop-helm
+Visit the frontend. You should see three different colors after reloading a few times.
 
-    NAME                             READY   STATUS    RESTARTS   AGE
-    color-api-86f8b7bb7d-29mt7       1/1     Running   0          8m48s
-    color-api-86f8b7bb7d-2lzql       1/1     Running   0          8m46s
-    color-api-86f8b7bb7d-rl78x       1/1     Running   0          15s
-    color-application-postgresql-0   1/1     Running   0          10m
-    frontend-68bcf87ffd-vvv5v        1/1     Running   0          10m
-    ```
+### 11. Package the Helm Chart
 
-    Visit the frontend - now we should see 3 different colors after reloading a few times.
+Package the Helm chart:
 
-10. Thats it - we have created a small basic helm chart. Lets package it
+```bash
+helm package color-application
+```
 
-    ```bash
-    helm package color-application
-    ```
+The packaged Helm chart is in the `color-application-0.1.0.tgz` file. Install the packaged Helm chart:
 
-    You can find the packaged helm chart in the `color-application-0.1.0.tgz` file.
+```bash
+helm install -n workshop-helm-packaged --create-namespace color-application color-application-0.1.0.tgz --set replicaCount=1
+```
 
-    You can install the packaged helm chart using the following command. Notice the `--set` flag to configure the amount of replicas. Since we made it configurable in the values.yaml file, we can use it here.
+The installation fails due to a conflicting path in the ingress. Maybe this can be made configurable as well?
 
-    ```bash
-    helm install -n workshop-helm-packaged --create-namespace color-application color-application-0.1.0.tgz --set replicaCount=1
+## Building and Publishing Docker Images
 
-
-    Error: INSTALLATION FAILED: 1 error occurred:
-        * admission webhook "validate.nginx.ingress.kubernetes.io" denied the request: host "_" and path "/helm" is already defined in ingress workshop-helm/frontend-ingress
-    ```
-
-    The installation fails, since we cannot again define the same path in the ingress. Maybe we can make that configurable as well?
-
-
-## Building and publishing the Docker-Images
+Build and push the Docker images:
 
 ```bash
 docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t ghcr.io/l3montree-dev/kubernetes-developer-workshop/nextjs-frontend:latest nextjs-frontend
 ```
-
 
 ```bash
 docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t ghcr.io/l3montree-dev/kubernetes-developer-workshop/color-api:latest color-api
