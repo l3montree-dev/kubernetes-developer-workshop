@@ -5,6 +5,8 @@
 > It is not intended for production use and does not cover all best practices.
 > Please dig especially into security topics before deploying anything to production.
 
+---
+
 This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
 
 > [!TIP]
