@@ -14,7 +14,7 @@ This workshop is intended for developers who want to learn how to deploy applica
 > ```bash
 > git clone git@github.com:l3montree-dev/kubernetes-developer-workshop.git
 > cd kubernetes-developer-workshop
-> ./check_environment.sh
+> ./check_env.sh
 > ```
 >
 > If the script notifies you of any missing dependencies, please install them before proceeding.
