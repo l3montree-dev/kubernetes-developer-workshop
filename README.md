@@ -7,6 +7,17 @@
 
 This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
 
+> [!TIP]
+> Check if your local environment is setup correctly by running the following command:
+> ```bash
+> git clone git@github.com:l3montree-dev/kubernetes-developer-workshop.git
+> cd kubernetes-developer-workshop
+> ./check_environment.sh
+> ```
+>
+> If the script notifies you of any missing dependencies, please install them before proceeding.
+
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
