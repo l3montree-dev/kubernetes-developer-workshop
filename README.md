@@ -4,6 +4,7 @@
 > All material provides **only an introduction** to containerization & K8s.
 > It is not intended for production use and does not cover all best practices.
 > Please dig especially into security topics before deploying anything to production.
+<<<<<<< HEAD
 
 ---
 
@@ -20,6 +21,11 @@ This workshop is intended for developers who want to learn how to deploy applica
 > If the script notifies you of any missing dependencies, please install them before proceeding.
 
 
+=======
+
+This workshop is intended for developers who want to learn how to deploy applications to Kubernetes.
+
+>>>>>>> cf091631907c00977c481f23fa39d807a474aad8
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
